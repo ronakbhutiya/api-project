@@ -1,16 +1,20 @@
 var h = document.querySelector(".users");
 const heading = document.querySelector("h2");
 const input = document.querySelector(".input");
-const userArr = [];
+let userArr = [];
 const getData = async () => {
   heading.innerHTML = "USER DETAILS👇";
   const URL = await fetch(`https://freetestapi.com/api/v1/users`);
   const data = await URL.json();
-
-  data.forEach((users) => {
+  userArr = data;
+  // console.log(userArr);
+  userDetails(data);
+};
+function userDetails(details) {
+  h.innerHTML = "";
+  details.forEach((users) => {
     const div = document.createElement("div");
     div.classList.add("user");
-    userArr.push(div);
 
     div.innerHTML = `
     <h3><span>NAME : </span> ${users.name}</h3>
@@ -25,10 +29,28 @@ const getData = async () => {
                 `;
     h.appendChild(div);
   });
-};
+}
 getData();
 
 input.addEventListener("input", (e) => {
   const val = e.target.value;
-  console.log(val);
+  searchInput(val);
 });
+function searchInput(value) {
+  // console.log(value);
+  const filterData = userArr.filter(
+    (cur) =>
+      cur?.username?.toLowerCase().includes(value.toLowerCase()) ||
+      cur?.email?.toLowerCase().includes(value.toLowerCase()) ||
+      cur?.name?.toLowerCase().includes(value.toLowerCase()) ||
+      cur?.occupation?.toLowerCase().includes(value.toLowerCase())
+  );
+
+  heading.innerHTML = "USER DETAILS👇";
+  if (filterData.length > 0) {
+    userDetails(filterData);
+  } else {
+    h.innerHTML = "";
+    heading.innerHTML = "USER NOT FOUND";
+  }
+}
